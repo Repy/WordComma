@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<customUI xmlns="http://schemas.microsoft.com/office/2009/07/customui" onLoad="Ribbon_Load">
+  <ribbon>
+    <tabs>
+      <tab idMso="TabAddIns">
+        <group id="WordComma"
+               label="差し込み印刷補助">
+			<button id="WordCommaComma" label="カンマ"
+				 screentip="カンマ" onAction="OnCommaButton"
+				 supertip="カンマ追加"/>
+        </group>
+      </tab>
+    </tabs>
+  </ribbon>
+</customUI>

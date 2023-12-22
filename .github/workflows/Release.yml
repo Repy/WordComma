@@ -1,0 +1,48 @@
+name: Release
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - '*'
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    env:
+      Configuration: Release
+      Solution_Name: WordComma.sln
+      Project_Name: WordComma
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Setup MSBuild.exe
+      uses: microsoft/setup-msbuild@v1.0.2
+
+    - name: Restore the application
+      run: |
+        nuget restore
+        msbuild /t:Restore /p:Configuration=${{ env.Configuration }} /p:RestorePackagesConfig=true
+
+    - name: Install pfx
+      run: |
+        $pfx_cert_byte = [System.Convert]::FromBase64String("${{ secrets.CERTIFICATE }}")
+        [IO.File]::WriteAllBytes("key.pfx", $pfx_cert_byte)
+        Import-PfxCertificate -FilePath "key.pfx" -CertStoreLocation "Cert:\CurrentUser\My" -Password (ConvertTo-SecureString -String "${{ secrets.CERTIFICATE_PASS }}" -AsPlainText -Force)
+
+    - name: Create the app package
+      run: |
+        msbuild ${{ env.Project_Name }} /target:build /p:Configuration=${{ env.Configuration }}
+        iscc Setup\setup.iss
+      
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        files: |
+          WordCommaSetup.exe
