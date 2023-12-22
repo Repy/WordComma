@@ -22,7 +22,7 @@ namespace WordComma
         {
             var document = Globals.ThisAddIn.Application.ActiveDocument;
             
-            foreach (var field in document.ActiveWindow.Selection.Fields)
+            foreach (Field field in document.ActiveWindow.Selection.Fields)
             {
                 field.Code.Text = field.Code.Text + " \\# \"0,\"";
             }
